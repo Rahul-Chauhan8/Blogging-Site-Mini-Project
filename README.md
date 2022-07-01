@@ -1,6 +1,5 @@
 # Blogging-Site-Mini-project
 
-
 Requirement
 Phase I
 Models
