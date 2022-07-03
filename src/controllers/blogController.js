@@ -2,7 +2,7 @@
 const blogModel = require('../models/blogModel')
 const authorModel = require('../models/authorModel')
 const jwt = require('jsonwebtoken')
-const middle = require('../middlewares/commonMiddle')
+const middle = require('../middleware/commonMiddle')
 
 /*------------------------------------------create blog:-------------------------------------------*/
 const createBlog = async function (req, res) {
@@ -178,6 +178,11 @@ const deleteByQuery = async (req, res) => {
     let decodedToken = jwt.verify(token, "functionup-project-1")
     
     let uesrmodified = decodedToken.userId
+
+let findblog = await blogModel.findOne({data})
+console.log(findblog)
+
+
 
     let allblog = await blogModel.updateMany(
       {
