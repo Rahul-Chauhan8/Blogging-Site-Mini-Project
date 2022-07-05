@@ -2,7 +2,7 @@
 const blogModel = require('../models/blogModel')
 const authorModel = require('../models/authorModel')
 const jwt = require('jsonwebtoken')
-const middle = require('../middleware/commonMiddle')
+// const middle = require('../middleware/commonMiddle')
 
 /*------------------------------------------create blog:-------------------------------------------*/
 const createBlog = async function (req, res) {
@@ -26,8 +26,8 @@ const createBlog = async function (req, res) {
       return res.status(400).send({ status: false, msg: "Body is missing" })
     }
 
-    if (body.length < 50) {
-      return res.status(400).send({ status: false, msg: "length of body must be greater than 50" })
+    if (body.length < 5) {
+      return res.status(400).send({ status: false, msg: "length of body must be greater than 5" })
     }
 
     if (!category) {
@@ -42,10 +42,10 @@ const createBlog = async function (req, res) {
     if (!validId) {
       return res.status(400).send({ status: false, msg: 'authorId is not correct' })
     }
-
-
     let savedData = await blogModel.create(data)
-    return res.status(201).send({ data: savedData })
+
+    // let savedData1 = await blogModel.create(data)
+    return res.status(201).send({ data: savedData})
   }
   catch (err) {
     console.log(err)
@@ -179,11 +179,6 @@ const deleteByQuery = async (req, res) => {
     
     let uesrmodified = decodedToken.userId
 
-let findblog = await blogModel.findOne({data})
-console.log(findblog)
-
-
-
     let allblog = await blogModel.updateMany(
       {
       $and:  [data,  {isDeleted: false} ,  {authorId: uesrmodified}] 
@@ -202,6 +197,7 @@ console.log(findblog)
     return res.status(500).send({ status: false, msg: error.message })
   }
 }
+
 
 
 /*------------------------------------------Export Modules:-------------------------------------------*/
