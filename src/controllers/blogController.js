@@ -2,13 +2,15 @@
 const blogModel = require('../models/blogModel')
 const authorModel = require('../models/authorModel')
 const jwt = require('jsonwebtoken')
-// const middle = require('../middleware/commonMiddle')
+const { title } = require('process')
 
 /*------------------------------------------create blog:-------------------------------------------*/
 const createBlog = async function (req, res) {
   try {
     let data = req.body
+
     let { authorId, title, body, category } = data
+
 
     if (Object.keys(data).length == 0) {
       return res.status(400).send({ status: false, msg: "Please request data to be created" })
@@ -45,7 +47,7 @@ const createBlog = async function (req, res) {
     let savedData = await blogModel.create(data)
 
     // let savedData1 = await blogModel.create(data)
-    return res.status(201).send({ data: savedData})
+    return res.status(201).send({ status: true, data: savedData })
   }
   catch (err) {
     console.log(err)
@@ -59,7 +61,7 @@ const getBlogs = async (req, res) => {
   try {
     let data = req.query
 
-    if(Object.keys(data).length===0){
+    if (Object.keys(data).length === 0) {
       return res.status(400).send({ status: false, msg: "Query parameter is empty / -invalid" })
     }
 
@@ -81,13 +83,15 @@ const updateBlog = async (req, res) => {
   try {
     let Id = req.params.blogId
 
-    if(Object.keys(Id).length===0){
+    if (Object.keys(Id).length === 0) {
       return res.status(400).send({ status: false, msg: "Path parameter is empty" })
     }
+
 
     let data = req.body
     let tags = req.body.tags
     let subcategory = req.body.subcategory
+
 
     if (!Id) {
       return res.status(400).send({ status: false, msg: "please enter the blog Id" })
@@ -97,9 +101,10 @@ const updateBlog = async (req, res) => {
     if (!user) {
       return res.status(404).send({ error: 'Document not found / already deleted' })
     }
-    if (user.isDeleted==true) {
+    if (user.isDeleted == true) {
       return res.status(404).send({ error: 'Document not found / already deleted' })
     }
+
 
     let updatedTags = user.tags
     if (tags) {
@@ -119,9 +124,8 @@ const updateBlog = async (req, res) => {
         subcategory: updatedSubCategory,
         body: data.body,
         isPublished: data.isPublished,
-        publishedAt: new Date(),
-    
-       
+        publishedAt: Date.now(),
+
       },
       { returnDocument: 'after' },
     )
@@ -136,12 +140,14 @@ const updateBlog = async (req, res) => {
 }
 
 
+
+
 /*------------------------------------------Delete by params:-------------------------------------------*/
 const deleteBlog = async function (req, res) {
   try {
     let Id = req.params.blogId
 
-    if(Object.keys(Id).length===0){
+    if (Object.keys(Id).length === 0) {
       return res.status(400).send({ status: false, msg: "Path parameter is empty" })
     }
 
@@ -152,7 +158,7 @@ const deleteBlog = async function (req, res) {
     let deletedDoc = await blogModel.updateOne(
       { _id: Id, isDeleted: false },
       {
-        isDeleted: true, DeletedAt: Date.now()
+        isDeleted: true, deletedAt: Date.now()
       },
       { returnDocument: 'after' },
     )
@@ -171,25 +177,25 @@ const deleteBlog = async function (req, res) {
 const deleteByQuery = async (req, res) => {
   try {
     let data = req.query
-    if(Object.keys(data).length===0){
+    if (Object.keys(data).length === 0) {
       return res.status(400).send({ status: false, msg: "Query parameter is empty / -invalid" })
     }
     let token = req.headers["x-api-key" || "X-Api-Key"]
     let decodedToken = jwt.verify(token, "functionup-project-1")
-    
+
     let uesrmodified = decodedToken.userId
 
     let allblog = await blogModel.updateMany(
       {
-      $and:  [data,  {isDeleted: false} ,  {authorId: uesrmodified}] 
+        $and: [data, { isDeleted: false }, { authorId: uesrmodified }]
       },
 
-      { isDeleted: true, deletedAt: Date.now() }, 
+      { isDeleted: true, deletedAt: Date.now() },
       { returnDocument: 'after' },
-    ) 
+    )
 
     if (allblog.modifiedCount == 0) {
-      return res.status(400).send({ status: false, msg: "No Document Found" })   
+      return res.status(400).send({ status: false, msg: "No Document Found" })
     }
     return res.status(200).send({ status: true, data: `${allblog.modifiedCount}-DELETED` })
   }

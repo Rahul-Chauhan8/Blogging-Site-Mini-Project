@@ -6,7 +6,7 @@ const app = express();
 
 /*------------------------------------------Bind Application Level Middleware:-------------------------------------------*/
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+
 
 /*------------------------------------------Connecting Data-Base:-------------------------------------------*/
 mongoose.connect("mongodb+srv://RahulChauhan:3aDm5xdCx8MiuHql@cluster0.xzyyibs.mongodb.net/blogProject", {
